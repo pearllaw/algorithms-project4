@@ -1,0 +1,11 @@
+# Ignore compiled files
+*.dSYM
+maxdefense_test
+experiment
+
+# Ignore IDE files
+.vscode/
+.idea/
+
+# Ignore system files
+.DS_Store
