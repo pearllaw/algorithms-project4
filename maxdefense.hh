@@ -158,7 +158,7 @@ std::unique_ptr<ArmorVector> load_armor_database(const std::string& path)
 // Convenience function to compute the total cost and defense in an ArmorVector.
 // Provide the ArmorVector as the first argument
 // The next two arguments will return the cost and defense back to the caller.
-void sum_armor_vector
+void sum_armor_vector 
 (
 	const ArmorVector& armors,
 	int& total_cost,
@@ -257,8 +257,18 @@ std::unique_ptr<ArmorVector> filter_armor_vector
 	int total_size
 )
 {
-	// TODO: implement this function, then delete this comment
-	return nullptr;
+	std::unique_ptr<ArmorVector> filtered_subset(new ArmorVector);
+
+	for (auto& s : source)
+	{
+		if (s->defense() >= min_defense && s->defense() <= max_defense && 
+			filtered_subset->size() < total_size)
+		{
+			filtered_subset->push_back(s);
+		}
+	}
+
+	return filtered_subset;
 }
 
 
@@ -273,8 +283,12 @@ std::unique_ptr<ArmorVector> dynamic_max_defense
 	int total_cost
 )
 {
+	std::unique_ptr<ArmorVector> todo(new ArmorVector(armors));
+	std::unique_ptr<ArmorVector> result(new ArmorVector);
+	int current_cost = 0;
+
 	// TODO: implement this function, then delete this comment
-	return nullptr;
+	return result;
 }
 
 
@@ -289,8 +303,39 @@ std::unique_ptr<ArmorVector> exhaustive_max_defense
 	double total_cost
 )
 {
-	// TODO: implement this function, then delete this comment
-	return nullptr;
+	const int n = armors.size();
+	assert(n < 64);
+	
+ 	std::unique_ptr<ArmorVector> best(new ArmorVector);
+    int best_total_cost = 0; 
+    double best_total_defense = 0;
+
+    for (uint64_t bits = 0; bits < pow(2, n);bits++)
+    {
+        ArmorVector *candidate = new ArmorVector;
+        int candidateCost = 0;
+        double candidateDefense = 0;
+        for (int j = 0;j < n;j++)
+        {
+            if (((bits >> j) & 1) == 1)
+            {
+                candidate->push_back(armors[j]);
+            }
+        }
+
+        sum_armor_vector(*candidate, candidateCost, candidateDefense);
+        
+		if (candidateCost <= total_cost)
+        {
+            if (best->empty() || candidateDefense > best_total_defense)
+            {
+                best = std::unique_ptr<ArmorVector>(candidate);
+                sum_armor_vector(*best, best_total_cost, best_total_defense);
+            }
+        }
+    }
+    
+    return best;
 }
 
 
