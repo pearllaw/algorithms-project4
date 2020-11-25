@@ -283,14 +283,49 @@ std::unique_ptr<ArmorVector> dynamic_max_defense
 	int total_cost
 )
 {
-	std::unique_ptr<ArmorVector> todo(new ArmorVector(armors));
+	std::unique_ptr<ArmorVector> items(new ArmorVector(armors));
+	int items_length = items->size();
+	int A[items_length + 1][total_cost + 1];	// empty 2d vector
+
+	// build table 
+	for (int i = 0; i <= items_length; i++)
+	{
+		for (int j = 0; j <= total_cost; j++)
+		{
+			if (i == 0 || j == 0)
+			{
+				A[i][j] = 0;
+			}
+			else if (items->at(i-1)->cost() <= j)
+			{
+				A[i][j] = fmax(items->at(i-1)->defense() + A[i-1][j - items->at(i-1)->cost()], 
+					A[i-1][j]);
+			}
+			else
+			{
+				A[i][j] = A[i-1][j];
+			}
+		}
+	}
+
+	int i = items_length;
+	int j = total_cost;
 	std::unique_ptr<ArmorVector> result(new ArmorVector);
-	int current_cost = 0;
 
-	// TODO: implement this function, then delete this comment
+	// find optimal solution
+	while (i > 0 && j > 0)
+	{
+		if (A[i][j] > A[i-1][j])
+		{
+			result->push_back(items->at(i-1));
+			j -= items->at(i-1)->cost();
+		}
+		i--;
+	}
 	return result;
-}
+	// TODO: implement this function, then delete this comment
 
+}
 
 // Compute the optimal set of armor items with an exhaustive search algorithm.
 // Specifically, among all subsets of armor items,
