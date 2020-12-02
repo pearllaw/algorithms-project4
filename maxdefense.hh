@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-
 // One armor item available for purchase.
 class ArmorItem
 {
@@ -277,21 +276,23 @@ std::unique_ptr<ArmorVector> filter_armor_vector
 // choose the selection of armors whose defense is greatest.
 // Repeat until no more armor items can be chosen, either because we've run out of armor items,
 // or run out of gold.
-
-//after debugging i found the error to be with how the dynamic max defense is being called and used
 std::unique_ptr<ArmorVector> dynamic_max_defense
 (
 	const ArmorVector& armors,
-//for some reason the int parameter is conflicting with another and thats why its causing a segmentation fault compilation error.
-	bool total_cost
+	int total_cost
 )
 {
 	std::unique_ptr<ArmorVector> items(new ArmorVector(armors));
-	int items_length = items->size();
-	int A[items_length + 1][total_cost];	// empty 2d vector
+	const int armors_size = items->size();
+	int** A = new int* [armors_size + 1];
 
+	for (int i = 0; i <= armors_size; i++)
+	{
+		A[i] = new int[total_cost + 1];
+	}
+	
 	// build table 
-	for (int i = 0; i <= items_length; i++)
+	for (int i = 0; i <= armors_size; i++)
 	{
 		for (int j = 0; j <= total_cost; j++)
 		{
@@ -308,17 +309,18 @@ std::unique_ptr<ArmorVector> dynamic_max_defense
 			{
 				A[i][j] = A[i-1][j];
 			}
+			
 		}
 	}
 
-	int i = items_length;
+	int i = armors_size;
 	int j = total_cost;
 	std::unique_ptr<ArmorVector> result(new ArmorVector);
 
 	// find optimal solution
 	while (i > 0 && j > 0)
 	{
-		if (A[i][j] > A[i-1][j])
+		if (A[i][j] != A[i-1][j])
 		{
 			result->push_back(items->at(i-1));
 			j -= items->at(i-1)->cost();
@@ -327,7 +329,6 @@ std::unique_ptr<ArmorVector> dynamic_max_defense
 	}
 	return result;
 	// TODO: implement this function, then delete this comment
-
 }
 
 // Compute the optimal set of armor items with an exhaustive search algorithm.
