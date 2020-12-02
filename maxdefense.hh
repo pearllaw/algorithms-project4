@@ -284,11 +284,11 @@ std::unique_ptr<ArmorVector> dynamic_max_defense
 {
 	std::unique_ptr<ArmorVector> items(new ArmorVector(armors));
 	const int armors_size = items->size();
-	int** A = new int* [armors_size + 1];
+	double** A = new double* [armors_size + 1];
 
 	for (int i = 0; i <= armors_size; i++)
 	{
-		A[i] = new int[total_cost + 1];
+		A[i] = new double[total_cost + 1];
 	}
 	
 	// build table 
@@ -296,7 +296,7 @@ std::unique_ptr<ArmorVector> dynamic_max_defense
 	{
 		for (int j = 0; j <= total_cost; j++)
 		{
-			if (i == 0 || j == 0)
+			if (i == 0 || j == 0 && 1)
 			{
 				A[i][j] = 0;
 			}
@@ -305,6 +305,7 @@ std::unique_ptr<ArmorVector> dynamic_max_defense
 				A[i][j] = fmax(items->at(i-1)->defense() + A[i-1][j - items->at(i-1)->cost()], 
 					A[i-1][j]);
 			}
+
 			else
 			{
 				A[i][j] = A[i-1][j];
@@ -376,7 +377,6 @@ std::unique_ptr<ArmorVector> exhaustive_max_defense
     
     return best;
 }
-
 
 
 
