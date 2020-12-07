@@ -329,7 +329,6 @@ std::unique_ptr<ArmorVector> dynamic_max_defense
 		i--;
 	}
 	return result;
-	// TODO: implement this function, then delete this comment
 }
 
 // Compute the optimal set of armor items with an exhaustive search algorithm.
